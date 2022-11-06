@@ -8,4 +8,5 @@ class DisabledCLITextPaneKeyMap(
     sessionKey: String
     , textPaneInputHandler: ITextPaneInputHandler
     , textPaneOutputHandler: ITextPaneOutputHandler
-): KeyMapAction(sessionKey, textPaneInputHandler, textPaneOutputHandler)
+    , tabID: String
+): KeyMapAction(sessionKey, textPaneInputHandler, textPaneOutputHandler, tabID)

@@ -9,6 +9,14 @@ class HistoryHandler : IHistory {
 
 	private var currentIndex: Int = 0;
 
+	override operator fun plusAssign(command: String) {
+		if (StringUtils.isNotEmpty(command)) {
+			history.add(command);
+			currentIndex = history.size;
+		}
+//		history += command
+	}
+
 	override fun addCommand(command: String) {
 		if (StringUtils.isNotEmpty(command)) {
 			history.add(command);

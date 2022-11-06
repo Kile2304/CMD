@@ -16,7 +16,7 @@ object Costants {
         val SOURCE_PRO_LIGHT = Font.createFont(
             Font.TRUETYPE_FONT,
             this::class.java.getResourceAsStream("/font/source_code_pro/SourceCodePro-Light.ttf")
-        ).deriveFont(Font.BOLD, 17f)
+        ).deriveFont(Font.BOLD, 14f)
 
         init {
             val ge = GraphicsEnvironment.getLocalGraphicsEnvironment()

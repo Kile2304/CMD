@@ -11,12 +11,17 @@ class TabKey {
 
     private var filesFilteredIndex: CircularIndex = CircularIndex(0)
     private val filesFilteredNames = mutableListOf<String>()
+    private val containSpace = Regex("\\s+")
 
     fun handleTab(
-        textPaneInputHandler: ITextPaneInputHandler, textPaneOutputHandler: ITextPaneOutputHandler, sessionKey: String
+        textPaneInputHandler: ITextPaneInputHandler
+        , textPaneOutputHandler: ITextPaneOutputHandler
+        , sessionKey: String
     ) {
         val userInput = textPaneInputHandler.getCommand(false)
         val commands = LineParser.parseLine(userInput)
+
+        //Caso: Prima volta che lo premo
         if (filesFilteredNames.isEmpty()) {
             val pathCommand = commands.lastOrNull() ?: ""
             getCommandFilePath(pathCommand, sessionKey).run {
@@ -28,19 +33,18 @@ class TabKey {
                     filesFilteredIndex = CircularIndex(filesFilteredNames.size)
                 }
             }
-
         }
+        //Caso: L'ho già premuto e devo cambiare percorso
         if (filesFilteredNames.isNotEmpty()) {
             val path = commands.lastOrNull() ?: ""
             val currFileName = filesFilteredNames[filesFilteredIndex.getAndIncrease()]
             val slashLastIndex = path.lastIndexOf("/")
             val backSlashLastIndex = path.lastIndexOf("\\")
-            val parentPath = if (backSlashLastIndex > slashLastIndex)
-                path.substring(0, backSlashLastIndex + 1)
-            else if (slashLastIndex > backSlashLastIndex)
-                path.substring(0, slashLastIndex + 1)
-            else
-                path
+            val parentPath = when  {
+                    backSlashLastIndex < slashLastIndex -> path.substring(0, slashLastIndex + 1)
+                    backSlashLastIndex > slashLastIndex -> path.substring(0, backSlashLastIndex + 1)
+                    else -> path
+                }
 
             if (!hasSpaceInThePath(parentPath, currFileName)) {
                 val currFileNameToAdd = if (path.contains("\"")) "$currFileName\"" else currFileName
@@ -55,9 +59,7 @@ class TabKey {
         }
     }
 
-    private val containSpace = Regex("\\s+")
-
-    private fun hasSpaceInThePath(parentPath: String, newPath: String) =
+    private fun hasSpaceInThePath(parentPath: String, newPath: String): Boolean =
         parentPath.contains(containSpace) || newPath.contains(containSpace)
 
     private fun getPathToDelete(path: String): String {
@@ -71,13 +73,11 @@ class TabKey {
             path
     }
 
-    private fun getCommandFilePath(path: String, sessionKey: String): File {
-        val toReturn = File(path.replace("\"", ""))
-        return if (toReturn.isAbsolute)
-            toReturn
-        else
-            File(UIHandler.getFrameFromSession(sessionKey).currentPath, path.replace("\"", ""))
-    }
+    private fun getCommandFilePath(path: String, sessionKey: String): File =
+        File(path.replace("\"", "")).let {
+            if (it.isAbsolute) it
+            else File(UIHandler.getFrameFromSession(sessionKey).currentPath, path.replace("\"", ""))
+        }
 
     fun clear() {
         filesFilteredNames.clear()

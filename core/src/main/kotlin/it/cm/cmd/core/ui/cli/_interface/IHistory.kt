@@ -7,5 +7,7 @@ interface IHistory {
 
     fun addCommand(toAdd: String)
 
+    operator fun plusAssign(command: String)
+
 //    public getPreviousCommand()
 }

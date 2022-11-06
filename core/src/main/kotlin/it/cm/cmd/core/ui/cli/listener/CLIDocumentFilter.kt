@@ -139,17 +139,17 @@ class CLIDocumentFilter(
      */
     @Throws(BadLocationException::class)
     override fun insertString(
-        fb: FilterBypass, offset: Int, string: String?,
+        fb: FilterBypass, offset: Int, string: String,
         attr: AttributeSet?
     ) {
         console.fireOnInsert(fb, offset, string, attr)
-        if (offset > 2000) {
+        if (offset + string.length > 10000) {
             forceClear = true
-            remove(fb, 0, 500)
+            remove(fb, 0, string.length)
             forceClear = false
 //            clearText()
 
-            fb.insertString(offset-500, string, attr)
+            fb.insertString(offset - string.length, string, attr)
         } else fb.insertString(offset, string, attr)
     }
 

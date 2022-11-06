@@ -2,16 +2,13 @@ package it.cm.cmd.core.ui.cli.component
 
 import it.cm.cmd.core.ui.cli._interface.ITextPaneInputHandler
 import it.cm.cmd.core.ui.cli._interface.ITextPaneOutputHandler
-import it.cm.cmd.core.ui.cli.listener.BatchDocument
 import it.cm.cmd.core.ui.cli.listener.CLIKeyListener
 import it.cm.cmd.core.ui.cli.listener.DisabledCLITextPaneKeyMap
 import it.cm.cmd.core.ui.cli.listener.actionMap.KeyMapAction
 import it.cm.cmd.core.ui.cli.util.AnsiUtil
-import it.cm.cmd.core.ui.cli.util.AnsiUtil.Companion.cReset
-import it.cm.cmd.core.ui.cli.util.AnsiUtil.Companion.temporaryNullify
-import java.awt.Color
-import java.awt.Container
-import java.awt.Graphics
+import it.cm.cmd.core.ui.cli.util.AnsiUtil.cReset
+import it.cm.cmd.core.ui.cli.util.AnsiUtil.temporaryNullify
+import java.awt.*
 import java.awt.event.KeyEvent
 import java.awt.event.KeyListener
 import java.util.*
@@ -22,14 +19,14 @@ import javax.swing.text.*
 
 
 class CLITextPane(
-    doc: StyledDocument = BatchDocument()
-    , val sessionkey: String
+    val sessionkey: String
     , textPaneInputHandler: ITextPaneInputHandler
     , textPaneOutputHandler: ITextPaneOutputHandler
     , isOnlyOut: Boolean
     , private val contentPane: Container?
+    , private val tabID: String
 
-) : JTextPane(doc) {
+) : JTextPane(DefaultStyledDocument()) {
 
     private var colorCurrent = cReset
     private var remaining = ""
@@ -45,25 +42,15 @@ class CLITextPane(
         if (!isOnlyOut) {
             keyListener =
                 CLIKeyListener(
-                    keymap, actions, sessionkey, textPaneInputHandler, textPaneOutputHandler
+                    keymap, actions, sessionkey, textPaneInputHandler, textPaneOutputHandler, tabID
                 )
             addKeyListener(keyListener as KeyListener)
         } else
             keyListener =
                 DisabledCLITextPaneKeyMap(
-                    sessionkey, textPaneInputHandler, textPaneOutputHandler
+                    sessionkey, textPaneInputHandler, textPaneOutputHandler, tabID
                 )
         addKillProcessHotKey()
-
-        val timer = Timer()
-        timer.schedule(object: TimerTask() {
-            override fun run() {
-                if (styledDocument != null) {
-                    (styledDocument as BatchDocument).processBatchUpdates(styledDocument.length)
-                }
-            }
-
-        }, 0,500)
 
 //        highlighter.removeAllHighlights()
     }
@@ -83,13 +70,14 @@ class CLITextPane(
         keyListener.runCommand(command)
     }
 
-    fun  append(color: Color = Color.WHITE, toAppend: String) {
+    fun append(color: Color = Color.WHITE, toAppend: String) {
         StyleConstants.setForeground(attr, color)
 
         setCharacterAttributes(attr, false)
 
+
 //        replaceSelection(toAppend) // there is no selection, so inserts at caret
-//        doc.insertString(doc.length, toAppend, null)
+//        document.insertString(document.length, toAppend, null)
 
 //        val docLengthMaximum = 200    //Il rimuovi non stà funzionando
 //
@@ -97,9 +85,10 @@ class CLITextPane(
 //
 //            styledDocument.remove(0, toAppend.length)
 //        }
-//        styledDocument.insertString(styledDocument.length, toAppend, attr)
-        (styledDocument as BatchDocument).appendBatchString(toAppend, attr)
-        (styledDocument as BatchDocument).appendBatchLineFeed(attr)
+        styledDocument.insertString(styledDocument.length, toAppend, attr)
+
+//        (styledDocument as BatchDocument).appendBatchString(toAppend, attr)
+//        (styledDocument as BatchDocument).appendBatchLineFeed(attr)
 //        if (System.currentTimeMillis() % 2 == 0L)
 //            (styledDocument as BatchDocument).processBatchUpdates(styledDocument.length)
 
@@ -110,10 +99,10 @@ class CLITextPane(
     private val regex = Regex("(?=\u001B\\[[^m]+m)")
     private val regex2 = Regex("\u001B\\[([^m]+)m")
     fun appendANSI(toAppend: String) { // convert ANSI color codes first
-        val t1 = System.currentTimeMillis()
+//        val t1 = System.currentTimeMillis()
 
 //        val addString = temporaryNullify(toAppend).replace("\r\n", "").replace(AnsiUtil.NEW_LINE, "\n")
-        val addString = toAppend
+//        val addString = toAppend
 //        print(addString)
 
 //        var start = System.currentTimeMillis()
@@ -171,13 +160,23 @@ class CLITextPane(
 //        val end2 = System.currentTimeMillis()
 
 //        println("Parsing: ${end - start}. Normal: ${end2 - start2}")
-        println("Time: ${System.currentTimeMillis() - t1}")
+//        println("Time: ${System.currentTimeMillis() - t1}")
 
     }
 
-//    override fun paintComponent(g: Graphics) {
-//
-//    }
+    protected fun setupAntialiasing(graphics: Graphics?) {
+        if (graphics is Graphics2D) {
+            val hints = RenderingHints(
+                RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON
+            )
+            graphics.setRenderingHints(hints)
+        }
+    }
+
+    override fun paintComponent(g: Graphics) {
+        setupAntialiasing(g)
+        super.paintComponent(g)
+    }
 
 
 }

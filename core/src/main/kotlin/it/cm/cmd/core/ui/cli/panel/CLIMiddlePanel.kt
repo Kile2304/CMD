@@ -15,8 +15,7 @@ import java.awt.Graphics
 import java.awt.GridLayout
 import java.awt.event.KeyEvent
 import java.awt.event.KeyListener
-import java.awt.event.MouseAdapter
-import java.awt.event.MouseEvent
+import java.util.*
 import javax.swing.*
 import javax.swing.text.AbstractDocument
 import javax.swing.text.DefaultCaret
@@ -31,13 +30,13 @@ class CLIMiddlePanel(
 ): JPanel() {
 
     private var tabbedPane: JTabbedPane? = null
-    private val textPanes: MutableList<Tab> = mutableListOf()
-    var _tab: Tab? = null
-        get() = if (textPanes.size > 0) textPanes[tabbedPane?.selectedIndex ?: 0] else null
+    val tabs: MutableList<Tab> = mutableListOf()
+    var selectedTab: Tab? = null
+        get() = if (tabs.size > 0) tabs[tabbedPane?.selectedIndex ?: 0] else null
         private set
 
-    var _textPane: CLITextPane? = null
-        get() = if (textPanes.size > 0) textPanes[tabbedPane?.selectedIndex ?: 0].textPane else null
+    var selectedTabPane: CLITextPane? = null
+        get() = if (tabs.size > 0) tabs[tabbedPane?.selectedIndex ?: 0].textPane else null
         private set
 
     private var addedTab = false
@@ -59,14 +58,15 @@ class CLIMiddlePanel(
             tabbedPane = tabbedPane()
             add(tabbedPane)
         } else {
-            val textpane = textPane()
-            textPanes.add(Tab(textpane, sessionkey, isOnlyOut, iCaretListener, textPaneOutputHandler))
+            val tabID = UUID.randomUUID().toString()
+            val textpane = textPane(tabID)
+            tabs.add(Tab(textpane, sessionkey, isOnlyOut, iCaretListener, textPaneOutputHandler, tabID))
             add(scrollPane(textpane))
         }
     }
 
     private fun tabbedPane() =
-        DraggableTabbedPane(textPanes).apply {
+        DraggableTabbedPane(tabs).apply {
             isOpaque = false
             background = CMD_BACKGROUND
 
@@ -120,13 +120,14 @@ class CLIMiddlePanel(
     /**
      * Creo il CLITextPane (JTextPane)
      */
-    private fun textPane() =
+    private fun textPane(tabID: String) =
         CLITextPane(
             sessionkey = sessionkey
             , textPaneInputHandler = iCaretListener._filter
             , textPaneOutputHandler = textPaneOutputHandler
             , isOnlyOut = isOnlyOut
             , contentPane = contentPane
+            , tabID = tabID
         ).apply {
             background = CMD_BACKGROUND
             isOpaque = false
@@ -155,15 +156,15 @@ class CLIMiddlePanel(
     }
 
     fun closeTab() {
-        if (tabbedPane != null && textPanes.size > 0)
+        if (tabbedPane != null && tabs.size > 0)
             tabbedPane!!.let {
                 isNotUpdatedByClick = true    //Il change listener non ha uno stato, quindi, gestisco lo stato a mano
-                textPanes.removeAt(it.selectedIndex)
+                tabs.removeAt(it.selectedIndex)
                 it.removeTabAt(it.selectedIndex)
-                if (textPanes.size > 0) {
-                    if (textPanes.size == it.selectedIndex) //Se cancello l'ultimo e ho ancora tab, metto il focus sul precedente
+                if (tabs.size > 0) {
+                    if (tabs.size == it.selectedIndex) //Se cancello l'ultimo e ho ancora tab, metto il focus sul precedente
                         it.selectedIndex = it.selectedIndex - 1
-                    _textPane?.requestFocus()   //Richiedo il focus, così posso continuare ad utilizzare actionmap
+                    selectedTabPane?.requestFocus()   //Richiedo il focus, così posso continuare ad utilizzare actionmap
                 } else
                     it.selectedIndex = -1   //Nessun tab
                 isNotUpdatedByClick = false
@@ -189,14 +190,15 @@ class CLIMiddlePanel(
 
     private fun createTab(tab: JTabbedPane, index: Int) {
         addedTab = true
-        textPane().run {
+        val tabID = UUID.randomUUID().toString()
+        textPane(tabID).run {
             //Inserisco il nuovo tab generico
             tab.insertTab("New Tab", null, scrollPane(this), "Tooltip", index)
             //Selezioni il nuovo tab
             tab.selectedIndex = index
             //Creo un'istanza che mi rappresenta il tab ed il suo contenuto
-            Tab(this, sessionkey, isOnlyOut, iCaretListener, textPaneOutputHandler).apply {
-                textPanes.add(this)
+            Tab(this, sessionkey, isOnlyOut, iCaretListener, textPaneOutputHandler, tabID).apply {
+                tabs.add(this)
                 init()
             }
             //Mi mette il focus sul textpane, in questo modo posso scrivere e utilizzare shortcut da subito
@@ -206,7 +208,7 @@ class CLIMiddlePanel(
     }
 
     fun disableTextPane() {
-        _textPane?.let {
+        selectedTabPane?.let {
             it.isFocusable = false
             it.addKeyListener(object: KeyListener {
                 override fun keyTyped(e: KeyEvent?) {

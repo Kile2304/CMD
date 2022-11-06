@@ -18,8 +18,6 @@ import org.apache.commons.lang3.StringUtils
 import java.awt.*
 import java.awt.event.AWTEventListener
 import java.awt.event.KeyEvent
-import java.awt.event.MouseAdapter
-import java.awt.event.MouseEvent
 import java.net.InetAddress
 import java.net.UnknownHostException
 import javax.swing.BorderFactory
@@ -53,7 +51,7 @@ abstract class CLIFrame2(
     override val _pasting: Boolean
         get() = pasting
     override val _textPane: CLITextPane?
-        get() = middlePanel._textPane
+        get() = middlePanel.selectedTabPane
     override val _consoleOffset: Int
         get() = (_textPane?.let { it.styledDocument.endPosition.offset - 1 }) ?: 0;
 
@@ -64,7 +62,7 @@ abstract class CLIFrame2(
 //        inputContext.selectInputMethod(Locale.ITALIAN)
         initMainLayout()
         addContents()
-        if (_textPane != null) {
+        _textPane?.let {
             if (isOnlyOut)
                 print("")
             else
@@ -206,6 +204,10 @@ abstract class CLIFrame2(
         _textPane?.appendANSI(toAppend)
     }
 
+    fun appendAnsi(toAppend: String, tabID: String) {
+        middlePanel.tabs.first { it.tabID == tabID }.textPane.appendANSI(toAppend)
+    }
+
     override fun clear() {
         _textPane?.let {
             filter.clearText()
@@ -214,9 +216,9 @@ abstract class CLIFrame2(
     }
 
     override fun changePath(path: String) {
-        middlePanel._tab?.currentPath = path
+        middlePanel.selectedTab?.currentPath = path
     }
-    override fun getCurrentPath() = middlePanel._tab?.currentPath ?: "Not provided"
+    override fun getCurrentPath() = middlePanel.selectedTab?.currentPath ?: "Not provided"
 
     final override fun changeTitle(title: String, toWindow: Boolean) {
         if (toWindow) {
@@ -226,6 +228,6 @@ abstract class CLIFrame2(
             middlePanel.changeTitle(title)
     }
 
-    fun getCurrentTab() = middlePanel._tab
+    fun getCurrentTab() = middlePanel.selectedTab
 
 }

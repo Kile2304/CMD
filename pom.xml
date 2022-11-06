@@ -21,6 +21,14 @@
     <logback.version>1.4.0</logback.version>
   </properties>
 
+    <repositories>
+        <repository>
+            <id>1</id>
+            <name>jcenter</name>
+            <url>https://jcenter.bintray.com/</url>
+        </repository>
+    </repositories>
+
   <dependencies>
 
     <dependency>
@@ -40,7 +48,18 @@
       <version>4.4</version>
     </dependency>
 
-    <!-- logback -->
+      <dependency>
+          <groupId>com.googlecode.lanterna</groupId>
+          <artifactId>lanterna</artifactId>
+          <version>3.0.0</version>
+      </dependency>
+
+      <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-log4j12</artifactId>
+          <version>1.7.25</version>
+      </dependency>
+      <!-- logback -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
@@ -92,8 +111,8 @@
                         </goals>
                         <configuration>
                             <sourceDirs>
-                                <source>src/main/kotlin</source>
-                                <source>src/main/resources</source>
+                                <source>src/it.cm.cmd.core.main/kotlin</source>
+                                <source>src/it.cm.cmd.core.main/resources</source>
                             </sourceDirs>
                         </configuration>
                     </execution>

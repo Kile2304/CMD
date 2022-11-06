@@ -6,7 +6,7 @@ import it.cm.cmd.core.ui.cli.CLIFrame2
 import it.cm.cmd.core.ui.cli._interface.ITextPaneInputHandler
 import it.cm.cmd.core.ui.cli._interface.ITextPaneOutputHandler
 import it.cm.cmd.core.ui.cli.listener.actionMap.KeyMapAction
-import it.cm.cmd.core.ui.cli.listener.keyboard.handleTab
+import it.cm.cmd.core.ui.cli.listener.keyboard.TabKey
 import java.awt.event.KeyEvent
 import java.awt.event.KeyListener
 import java.util.concurrent.atomic.AtomicBoolean
@@ -24,12 +24,13 @@ class CLIKeyListener(
     , private val sessionKey: String
     , private val textPaneInputHandler: ITextPaneInputHandler
     , private val textPaneOutputHandler: ITextPaneOutputHandler
-) : KeyMapAction(sessionKey, textPaneInputHandler, textPaneOutputHandler), KeyListener {
+    , private val tabID: String
+) : KeyMapAction(sessionKey, textPaneInputHandler, textPaneOutputHandler, tabID), KeyListener {
 
     private var process: Process? = null
     private val frame: CLIFrame2
         get() = UIHandler.getFrameFromSession(sessionKey) as CLIFrame2
-    private val handleTab =
+    private val handleTab = TabKey()
 
     init {
         val newKeyBindings = keyBindings()
@@ -81,9 +82,10 @@ class CLIKeyListener(
 //            e.consume()
         when (e.keyCode) {
 //            KeyEvent.VK_V -> e.consume()
-            KeyEvent.VK_ENTER -> e.consume()
+            KeyEvent.VK_ENTER -> { e.consume(); handleTab.clear() }
             KeyEvent.VK_TAB -> e.consume()
-            KeyEvent.VK_ALT_GRAPH -> e.consume()
+            KeyEvent.VK_ALT_GRAPH -> { e.consume(); handleTab.clear() }
+            else -> handleTab.clear()
         }
 //        fireKeyPressed(e);
     }
@@ -94,20 +96,18 @@ class CLIKeyListener(
         when (e.keyCode) {
             KeyEvent.VK_ENTER -> {
                 val userInput = CommandConstants.replaceWithTemplate(textPaneInputHandler.getCommand(true))
-                frame.getCurrentTab()?.history?.addCommand(userInput)
+                frame.getCurrentTab()?.let { it.history += userInput }
                 runCommand(userInput)
     //            fireCommand(command)
             }
             KeyEvent.VK_UP -> handleUpKey()
             KeyEvent.VK_DOWN -> handleDownKey()
             KeyEvent.VK_ESCAPE -> handleDownEscape()
-            KeyEvent.VK_TAB -> handleTab(textPaneInputHandler, textPaneOutputHandler, sessionKey)
+            KeyEvent.VK_TAB -> handleTab.handleTab(textPaneInputHandler, textPaneOutputHandler, sessionKey)
         }
 
 //        fireKeyReleased(e)
     }
-
-    var tempo = 0L
 
     private fun handleDownEscape() {
         textPaneInputHandler.clearUserInput();
