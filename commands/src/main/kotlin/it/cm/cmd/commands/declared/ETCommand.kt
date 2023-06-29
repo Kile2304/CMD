@@ -5,7 +5,11 @@ import it.cm.parser.BaseArgument
 import it.cm.parser.annotation.Command
 import it.cm.parser.annotation.Parameter
 
-@Command(name = "ET", classExecutor = ETRunner::class)
+@Command(
+    name = "ET"
+    , classExecutor = ETRunner::class
+    , description = "Allow you to create event for the event system"
+)
 class ETCommand : BaseArgument() {
 
     @Parameter(
@@ -14,6 +18,7 @@ class ETCommand : BaseArgument() {
         , names = [ "type", "t" ]
         , hasArguments = true
         , required = true
+        , description = "Event type: ...."
     )
     var type: String = ""
         private set

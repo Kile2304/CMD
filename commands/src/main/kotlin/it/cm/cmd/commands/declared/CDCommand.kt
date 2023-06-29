@@ -5,7 +5,7 @@ import it.cm.parser.BaseArgument
 import it.cm.parser.annotation.Command
 import it.cm.parser.annotation.Parameter
 
-@Command(name = "CD", classExecutor = CDRunner::class)
+@Command(name = "CD", classExecutor = CDRunner::class, description = "Allow you to change the current directory")
 class CDCommand : BaseArgument() {
 
     @Parameter(

@@ -92,7 +92,7 @@ class ShortcutCommand: BaseArgument(), ICommandRunner {
             val updater = it.toUpdater()
             if (updater is GitShortcutUpdater) {
                 updater.apply {
-                    if (!arg.name.isEmpty())
+                    if (arg.name.isNotEmpty())
                         name = arg.name
                     if (arg.wID != -1)
                         id = arg.wID

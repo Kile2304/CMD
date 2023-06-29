@@ -6,7 +6,12 @@ import it.cm.parser._interface.ICommandValidation
 import it.cm.parser.annotation.Command
 import it.cm.parser.annotation.Parameter
 
-@Command(name = "JSET", classExecutor = JSetRunner::class)
+@Command(
+    name = "JSET"
+    , classExecutor = JSetRunner::class
+    , description = "Allow you to create console environment variable that you can"
+                    + " call use on all your command by writing \${var_name}"
+)
 class JSetCommand : BaseArgument(), ICommandValidation {
 
     companion object {
@@ -18,6 +23,7 @@ class JSetCommand : BaseArgument(), ICommandValidation {
         , index = 0
         , names = [ "name", "n" ]
         , required = true
+        , description = "The name of the variable"
     )
     var name: String = ""
         private set
@@ -27,6 +33,7 @@ class JSetCommand : BaseArgument(), ICommandValidation {
         , index = 1
         , names = [ "value", "v" ]
         , required = true
+        , description = "The value of the variable"
     )
     var value: String = ""
         private set
@@ -36,6 +43,7 @@ class JSetCommand : BaseArgument(), ICommandValidation {
         , names = [ "java", "j" ]
         , required = false
         , hasArguments = false
+        , description = "Deprated, i don't remember"
     )
     var javaVariable: Boolean = false
         private set

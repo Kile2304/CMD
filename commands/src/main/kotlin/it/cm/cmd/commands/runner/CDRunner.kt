@@ -2,6 +2,7 @@ package it.cm.cmd.commands.runner
 
 import it.cm.common.ui.UIHandler
 import it.cm.cmd.commands.declared.CDCommand
+import it.cm.cmd.common.AnsiUtil
 import it.cm.parser.BaseArgument
 import it.cm.parser.CommandRunner
 import org.slf4j.LoggerFactory
@@ -17,11 +18,11 @@ class CDRunner : CommandRunner() {
         var path = File(cdCommand.path)
         val sessionFrame = UIHandler.getFrameFromSession(sessionKey)
         if (!path.isAbsolute)
-            path = File(sessionFrame.currentPath, cdCommand.path)
+            path = File(sessionFrame!!.currentPath, cdCommand.path)
         if (path.exists() && path.isDirectory)
-            sessionFrame.changePath(path.canonicalPath)
+            sessionFrame?.currentPath = path.canonicalPath
         else
-            sessionFrame.appendLine("Il percorso specificato non è valido", Color.RED)
+            sessionFrame?.appendAnsiLine("\n${AnsiUtil.ANSI_RED}Il percorso specificato non è valido${AnsiUtil.ANSI_RESET}")
     }
 
 }

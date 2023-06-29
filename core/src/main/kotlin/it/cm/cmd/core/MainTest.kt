@@ -1,17 +1,17 @@
 package it.cm.cmd.core
 
-import it.cm.cmd.core.ui.cli.CLIFrame2
+import it.cm.cmd.core.terminal.frame.TerminalFrame
 import it.cm.common.ui.UIHandler
 import it.cm.parser.RuntimeCommand
 import it.cm.ui.swing.utils.installTheme
 import java.io.File
 import javax.swing.SwingUtilities
 
-class CliNow(sessionKey: String): CLIFrame2(false, sessionKey)
+
+class CliNow(sessionKey: String): TerminalFrame(false, sessionKey)
 
 fun main() {
     installTheme("/themes/Dracula.theme.json")
-    initCLIFrame(File("C:\\Sviluppo\\Software\\Runner\\"))
     RuntimeCommand.COMMANDS.entries
     UIHandler.setDefaultCMD(CliNow::class.java)
     SwingUtilities.invokeLater {
@@ -19,4 +19,5 @@ fun main() {
             isVisible = true
         }
     }
+    println("here")
 }

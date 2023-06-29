@@ -9,6 +9,7 @@
   <modules>
     <module>core</module>
     <module>commands</module>
+    <module>common</module>
   </modules>
 
   <properties>
@@ -31,6 +32,23 @@
 
   <dependencies>
 
+      <!-- Testare questa libreria -->
+      <dependency>
+          <groupId>org.pushing-pixels</groupId>
+          <artifactId>radiance-animation</artifactId>
+          <version>6.5.0</version>
+      </dependency>
+
+      <dependency>
+          <groupId>it.cm.Service</groupId>
+          <artifactId>service-common</artifactId>
+          <version>1.1-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+          <groupId>it.cm.Service</groupId>
+          <artifactId>service-core</artifactId>
+          <version>1.1-SNAPSHOT</version>
+      </dependency>
     <dependency>
       <groupId>it.cm.parser</groupId>
       <artifactId>LineParser</artifactId>
@@ -95,61 +113,6 @@
     </dependency>
 
   </dependencies>
-
-  <build>
-        <plugins>
-            <plugin>
-                <groupId>org.jetbrains.kotlin</groupId>
-                <artifactId>kotlin-maven-plugin</artifactId>
-                <version>${kotlin.version}</version>
-                <executions>
-                    <execution>
-                        <id>compile</id>
-                        <phase>process-sources</phase>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                        <configuration>
-                            <sourceDirs>
-                                <source>src/it.cm.cmd.core.main/kotlin</source>
-                                <source>src/it.cm.cmd.core.main/resources</source>
-                            </sourceDirs>
-                        </configuration>
-                    </execution>
-                </executions>
-                <configuration>
-                    <jvmTarget>1.8</jvmTarget>
-                    <compilerPlugins>
-                        <plugin>kotlinx-serialization</plugin>
-                    </compilerPlugins>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.jetbrains.kotlin</groupId>
-                        <artifactId>kotlin-maven-serialization</artifactId>
-                        <version>${kotlin.version}</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.2</version>
-            </plugin>
-            <plugin>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <version>2.22.2</version>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>11</source>
-                    <target>11</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
 
 </project>
 

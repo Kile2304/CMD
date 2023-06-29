@@ -22,13 +22,13 @@ class ETRunner : CommandRunner() {
 
         val frame = UIHandler.getFrameFromSession(sessionKey)
         val process = CmdCommon.execCMDCommand(
-            frame.currentPath
+            frame!!.currentPath
             , "${eventCreator.absolutePath} ${etCommand.type} ${etCommand.path}")
         val infos: Thread =
             ReaderThread(
                 InputStreamReader(process!!.inputStream, Charsets.UTF_8)
                 , System.out
-                , UIHandler.getFrameFromSession(sessionKey)
+                , frame
             )
         infos.start()
         val onExit: CompletableFuture<Process> = process.onExit()

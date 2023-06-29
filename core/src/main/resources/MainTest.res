@@ -13,10 +13,10 @@ import com.jediterm.terminal.ui.settings.DefaultSettingsProvider
 import com.jediterm.terminal.ui.settings.DefaultTabbedSettingsProvider
 import com.jediterm.terminal.ui.settings.SettingsProvider
 import com.pty4j.PtyProcess
-import it.cm.cmd.core.ui.cli.CLIFrame2
-import it.cm.cmd.core.ui.cli.CTextPane
-import it.cm.cmd.core.ui.cli.listener.CLIKeyListener
-import it.cm.cmd.core.ui.cli.util.AnsiUtil
+import it.cm.cmd.core.terminal.cli.CLIFrame2
+import it.cm.cmd.core.terminal.cli.CTextPane
+import it.cm.cmd.core.terminal.CLIKeyListener
+import it.cm.cmd.core.terminal.cli.util.AnsiUtil
 import it.cm.common.cmd.CmdCommon
 import it.cm.common.ui.UIHandler
 import it.cm.parser.RuntimeCommand
@@ -83,7 +83,7 @@ fun main2() {
         size = Dimension(800, 600)
         defaultCloseOperation = EXIT_ON_CLOSE
         setLocationRelativeTo(null)
-        layerPane = JLayeredPane().apply { layout = it.cm.cmd.core.ui.test.TerminalLayout() }
+        layerPane = JLayeredPane().apply { layout = it.cm.cmd.core.terminal.test.TerminalLayout() }
         val terminalPanel = CTextPane()
     }
 
@@ -99,7 +99,7 @@ fun main2() {
 //        val terminal = createTabbedTerminalWidget()
 //        contentPane.add("center", terminal.component)
 //        getSession(terminal)
-        layerPane = JLayeredPane().apply { layout = it.cm.cmd.core.ui.test.TerminalLayout() }
+        layerPane = JLayeredPane().apply { layout = it.cm.cmd.core.terminal.test.TerminalLayout() }
         term = TerminalPanel(s, buffer, styleState)
         jediTerminal = JediTerminal(term, buffer, styleState);
 //        jediTerminal.setModeEnabled(TerminalMode.AltSendsEscape, s.altSendsEscape())
